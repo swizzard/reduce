@@ -89,7 +89,6 @@ function map<Input, Mapped>(
 // write `makeFlatMapFunction`, a function that returns a `ReducerFn` that
 // could be used to apply a function that returns an array to every element
 // of an array and concatenates the results
-// see note 2 below, if you want
 function makeFlatMapFunction<Input, Mapped>(
   f: (input: Input) => Array<Mapped>
 ): ReducerFn<Input, Array<Mapped>> {
@@ -102,6 +101,8 @@ function flatMap<Input, Mapped>(
 ): Array<Mapped> {
   return undefined;
 }
+
+// see note 2 below, if you want
 
 //
 //
@@ -162,7 +163,7 @@ function findIndex<Input>(
 // f(x, f(y, z)) === f(f(x, y), z) (associativity, e.g. 1 + (2 + 3) === (1 + 2) + 3)
 // f(x, e) === f(e, x) === x (identity, e.g 1 + 0 === 0 + 1 === 1)
 //
-// list concatenation is another Monoid, where `T` = Array<Whatever>, `e` = [],
+// list concatenation is another Monoid, where `T` = Array<any>, `e` = [],
 // and `f` = list1 ++ list2
 //
 //
