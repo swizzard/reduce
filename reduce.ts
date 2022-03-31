@@ -6,8 +6,8 @@ type Reduce<Input, Output> = (
 ) => Output;
 
 type ReducerFn<Input, Output> = (
-  value: Input,
   accumulator: Output,
+  value: Input,
   index: number,
   array: Array<Input>
 ) => Output;
@@ -33,7 +33,8 @@ const anyDefined: ReducerFn<any, boolean> = (val, acc) =>
   typeof val !== 'undefined' || acc;
 
 // let's write `concatAll`, which concatenates (flattens) an `Array<Array<any>>`
-const concatAll: ReducerFn<Array<Array<any>>, Array<any>> = undefined;
+const concatAll: ReducerFn<Array<Array<any>>, Array<any>> = (val, acc) =>
+  val.concat(acc);
 
 function concat(arrays: Array<Array<any>>): Array<any> {
   return arrays.reduce(concatAll, []);
@@ -45,30 +46,49 @@ function concat(arrays: Array<Array<any>>): Array<any> {
 
 // let's write `makeAnyFunction`, a function that returns a `ReducerFn` that
 // could be used to check if _any_ element in an array passes a given test
-function makeAnyFunction<Input>(f: any): ReducerFn<Input, boolean> {
-  return undefined;
+function makeAnyFunction<Input>(
+  f: (arg: Input) => boolean
+): ReducerFn<Input, boolean> {
+  const rf: ReducerFn<Input, boolean> = (acc, val) => !!acc || f(val);
+  return rf;
 }
 
-function boolAny<Input>(
-  input: Array<Input>,
-  fn: ReducerFn<Input, boolean>
-): boolean {
-  return undefined;
-}
+type Person = {
+  name: string;
+  age: number;
+};
+
+const anyOver18: ReducerFn<Person, boolean> = makeAnyFunction(
+  (p: Person) => p.age > 18
+);
+
+// [
+//   { name: 'sam', age: 38 },
+//   { name: 'cindy lou who', age: 5 },
+// ].reduce(anyOver18, false);
+
+// function boolAny<Input>(
+//   input: Array<Input>,
+//   fn: ReducerFn<Input, boolean>
+// ): boolean {
+//   return input.reduce(fn, false);
+// }
 
 // now it's your turn!
 
 // write `makeFilterFunction`, a function that returns a `ReducerFn` that could
 // be used to filter out elements that don't pass a given test
-function makeFilterFunction<Input>(f: any): ReducerFn<Input, Array<Input>> {
-  return undefined;
+function makeFilterFunction<Input>(
+  f: (arg: Input) => boolean
+): ReducerFn<Input, Array<Input>> {
+  return (acc, val) => (f(val) ? [...acc, val] : acc);
 }
 
 function filter<Input>(
   array: Array<Input>,
   fn: ReducerFn<Input, Array<Input>>
 ): Array<Input> {
-  return undefined;
+  return array.reduce(fn, []);
 }
 
 // write `makeMapFunction`, a function that returns a `ReducerFn` that
@@ -76,14 +96,15 @@ function filter<Input>(
 function makeMapFunction<Input, Mapped>(
   f: (input: Input) => Mapped
 ): ReducerFn<Input, Array<Mapped>> {
-  return undefined;
+  return (acc, val) => [...acc, f(val)];
 }
 
 function map<Input, Mapped>(
   array: Array<Input>,
   fn: ReducerFn<Input, Mapped>
 ): Array<Mapped> {
-  return undefined;
+  const starter: Array<Mapped> = [];
+  return array.reduce(fn, starter);
 }
 
 // write `makeFlatMapFunction`, a function that returns a `ReducerFn` that
@@ -92,14 +113,14 @@ function map<Input, Mapped>(
 function makeFlatMapFunction<Input, Mapped>(
   f: (input: Input) => Array<Mapped>
 ): ReducerFn<Input, Array<Mapped>> {
-  return undefined;
+  return (acc, val) => [...acc, ...f(val)];
 }
 
 function flatMap<Input, Mapped>(
   array: Array<Input>,
   fn: ReducerFn<Input, Array<Mapped>>
 ): Array<Mapped> {
-  return undefined;
+  return array.reduce(fn, []);
 }
 
 // see note 2 below, if you want
@@ -111,30 +132,30 @@ function flatMap<Input, Mapped>(
 // write `makeFindFunction`, a function that returns a `ReducerFn` that could
 // be used to find the first element that passes a given test, or `undefined`
 // if no element passes
-function makeFindFunction<Input>(f: any): ReducerFn<Input, Input | undefined> {
-  return undefined;
-}
+// function makeFindFunction<Input>(f: any): ReducerFn<Input, Input | undefined> {
+//   return undefined;
+// }
 
-function find<Input>(
-  array: Array<Input>,
-  fn: ReducerFn<Input, Input | undefined>
-): Input | undefined {
-  return undefined;
-}
+// function find<Input>(
+//   array: Array<Input>,
+//   fn: ReducerFn<Input, Input | undefined>
+// ): Input | undefined {
+//   return undefined;
+// }
 
-// write `makeFindIndexFunction`, a function that returns a `ReducerFn` that
-// could be used to find the index of the first element that passes a given
-// test, or `-1` if no element passes
-function makeFindIndexFunction<Input>(f: any): ReducerFn<Input, number> {
-  return undefined;
-}
+// // write `makeFindIndexFunction`, a function that returns a `ReducerFn` that
+// // could be used to find the index of the first element that passes a given
+// // test, or `-1` if no element passes
+// function makeFindIndexFunction<Input>(f: any): ReducerFn<Input, number> {
+//   return undefined;
+// }
 
-function findIndex<Input>(
-  array: Array<Input>,
-  fn: ReducerFn<Input, number>
-): number {
-  return undefined;
-}
+// function findIndex<Input>(
+//   array: Array<Input>,
+//   fn: ReducerFn<Input, number>
+// ): number {
+//   return undefined;
+// }
 
 // extra extra credit
 //
